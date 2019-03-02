@@ -13,13 +13,19 @@
         {{examples[index].length}}
       </div>
     </div>
-    recording: {{recording}}<br />
-    <!-- examples: {{examples}}<br /> -->
+
     logs: {{logs}}
     <p v-if="loss">{{loss}}</p>
+    <p v-if="prediction.length">{{prediction}}</p>
     <div class="addButton" @click="addVariant">+</div>
     <div class="fitButton" @click="fitModel">fit</div>
-    <div class="recordButton" v-touch:start.prevent="startRecord" v-touch:end.prevent="endRecord"></div>
+    <div 
+      class="recordButton"
+      :class="{
+        active: recording
+      }"
+      v-touch:start.prevent="startRecord"
+      v-touch:end.prevent="endRecord"></div>
   </div>
 </template>
 
@@ -35,6 +41,7 @@ export default {
     return {
       examples: [[]],
       currentVariant: 0,
+      prediction: [],
       currentExample: {},
       recording: false,
       model: null,
@@ -107,6 +114,7 @@ export default {
 
         const res = this.model.predict(dataXt);
         const arr = res.arraySync()[0];
+        this.prediction = arr;
         arr.forEach((val, i) => {
           if (val > 0.5) {
             this.currentVariant = i;
@@ -190,14 +198,21 @@ export default {
 
 .variant {
   border: 3px solid red;
-  padding: 50px;
+  padding: 30px 50px;
   background: red;
   border-radius: 50px;
+}
+
+
+.variant.active {
+  border-color: black;
+  background:yellow;
 }
 
 .addButton {
   width:50px;
   height:50px;
+  float:left;
   background: lightgreen;
   border-radius: 50px;
   display: flex;
@@ -206,6 +221,7 @@ export default {
 }
 
 .fitButton {
+  float:left;
   width:50px;
   height:50px;
   background: magenta;
@@ -215,9 +231,6 @@ export default {
   align-items: center;
 }
 
-.variant.active {
-  border-color: black;
-}
 
 .recordButton {
   position: fixed;
@@ -230,6 +243,10 @@ export default {
   width: 100px;
   vertical-align: middle;
   text-align: center;
+}
+
+.recordButton.active {
+  background:red;
 }
 </style>
 
